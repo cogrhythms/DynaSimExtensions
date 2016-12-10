@@ -1,0 +1,50 @@
+% iRegularGABAa:
+%   Produces synaptic consistently spaced spike trains in the fashion of a
+%   regular synapse.
+%   2 modes:
+%     1) A single pool of sources that is connected to all cells. Default mode.
+%     2) A unique pool of sources exists for each cell. Set uniqueSourcesBool = true.
+%   For both modes, connections can be made random by reducing prob_cxn from 1.
+%   The total input to any one target cell is divided by the number of sources
+%   to "normalize" the current contribution.
+%
+% Dependencies: Relies on "GenerateRegularSpikeTrain.m" though I'm not sure if that file
+%   needs to be in just your DNSIM path, or the database itself, or either.
+%
+% Usage: Use it as an autapse connection: e.g. "TC-TC".
+%
+% Author: Erik Roberts. Originally from  Ben Poletta-Pittman. It was then modified
+%   by Austin Soplata using "dend_iMultiPoissonExp.txt" as a template.
+%
+% Tags: synapse, connection
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+rate = 2
+gSyn = 1
+Esyn = -80
+tau_1 = 1
+tau_d = 5
+tau_r = .25
+Nsources = 1 %n of sources of spikes
+prob_cxn = 1
+Tstart = 0
+uniqueSourcesBool = false
+
+% Connectivity
+if ~uniqueSourcesBool
+  netcon = rand(Nsources,N_post)<=prob_cxn
+  NsourcesTot = Nsources;
+else
+  netcon = repmat(eye(Nsources), N_post,1);
+  NsourcesTot = Nsources * N_post;
+end
+
+% Functions
+Gspikes = GenerateRegularSpikeTrain(NsourcesTot, rate, tau_1, tau_d, tau_r, T, dt, Tstart)
+
+IRegularGABAa(X,t) = gSyn/Nsources .* Gspikes(max(1,round(t/dt)), :) * netcon .* (X-Esyn)
+
+% Record all the things!
+monitor functions
+
+@current += -IRegularGABAa(X,t)

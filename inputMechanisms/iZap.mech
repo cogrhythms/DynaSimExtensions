@@ -1,0 +1,19 @@
+% iZap:
+%     Produces a zap current for all cells. Use with 1 second.
+% Dependencies: None
+% Usage: Use it as an autapse connection: e.g. "TC-TC".
+% Reference: Erik Roberts
+% Tags: synapse, connection
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Iamp = 1 %current
+tStart = 0
+
+% Functions
+zapTS = GenerateZap(tStart, T, N_pre)
+IZap(X,t) = Iamp*zapTS(max(1,round(t/dt)), :)
+
+% Record all the things!
+monitor functions
+
+@current += IZap(X,t)

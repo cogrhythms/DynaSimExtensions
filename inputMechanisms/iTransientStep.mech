@@ -1,0 +1,22 @@
+% iTransientStep:
+%     Produces a current step at a given time for a given length of time for all cells.
+% Dependencies: None
+% Usage: Use it as an autapse connection: e.g. "TC-TC".
+% Reference: Erik Roberts
+% Tags: synapse, connection
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+tStart = 100 %start time [ms]
+tLen = 100 %time length [ms]
+Istep = 1 %current
+
+tEnd = tStart+tLen
+
+% Functions
+stepTS = GenerateTransientStep(tStart, tEnd, T, N_pre)
+ITransientStep(X,t) = Istep*stepTS(max(1,round(t/dt)), :)
+
+% Record all the things!
+monitor functions
+
+@current += ITransientStep(X,t)
