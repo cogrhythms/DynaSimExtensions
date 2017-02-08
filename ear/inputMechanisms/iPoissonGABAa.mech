@@ -1,5 +1,5 @@
 % iPoissonGABAa:
-%   Produces synaptic consistently spaced spike trains in the fashion of a
+%   Produces synaptic poisson-distributed spike trains in the fashion of a
 %   regular synapse.
 %   2 modes:
 %     1) A single pool of sources that is connected to all cells. Default mode.

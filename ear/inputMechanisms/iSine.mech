@@ -1,0 +1,13 @@
+% iSin(t) sinusoidal stimulus of raw charge
+sinAmp = 1
+sinFreq = 1 %Hz
+Tstart = 100 %start time [ms]
+
+sinWave = GenerateSin(Tstart, T, sinFreq)
+onesNpre = ones(1,N_pre)
+
+ISine(X,t) = sinAmp * sinWave(max(1,round(t/dt))) * onesNpre
+
+monitor functions
+
+@current += ISine(X,t)

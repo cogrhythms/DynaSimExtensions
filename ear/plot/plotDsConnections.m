@@ -9,7 +9,8 @@ function plotDsConnections(data, s, connectionNumber)
     if ~isempty(conFields)
       for fieldInd = 1:length(conFields)
         conField = conFields{fieldInd};
-        h(fieldInd) = PlotData(data,'variable', conField,'visible','off');
+         handles = PlotData(data,'variable', conField,'visible','off','max_num_rows',1);
+         h(fieldInd) = handles(1);
     %       ti{fieldInd} = strrep(conField,'_','-');
         lastInd = regexpi(conField,conName,'end');
         ti{fieldInd} = conField(lastInd+2:end);

@@ -1,0 +1,16 @@
+% iUniformSquareNeg: Provide a square wave of pure, applied current into the cell
+
+squareAmp = 1
+squareFreq = 1 %Hz
+Tstart = 100 %start time [ms]
+dutyCycle = .5
+smoothSquareBool = false
+
+squareWaveNeg = GenerateUniformSquare(Tstart, T, squareFreq, dutyCycle, smoothSquareBool)
+onesNpre = ones(1,N_pre)
+
+IUniformSquareNeg(X,t) = -squareAmp .* squareWaveNeg(max(1,round(t/dt))) * onesNpre
+
+monitor functions
+
+@current += IUniformSquareNeg(X,t)

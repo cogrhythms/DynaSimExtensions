@@ -1,0 +1,16 @@
+% iUniformSquare: Provide a square wave of pure, applied current into the cell
+
+squareAmp = 1
+squareFreq = 1 %Hz
+Tstart = 100 %start time [ms]
+dutyCycle = .5
+smoothSquareBool = false
+
+squareWave = GenerateUniformSquare(Tstart, T, squareFreq, dutyCycle, smoothSquareBool)
+onesNpre = ones(1,N_pre)
+
+IUniformSquare(X,t) = squareAmp .* squareWave(max(1,round(t/dt))) * onesNpre
+
+monitor functions
+
+@current += IUniformSquare(X,t)

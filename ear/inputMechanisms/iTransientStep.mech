@@ -6,14 +6,14 @@
 % Tags: synapse, connection
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-tStart = 100 %start time [ms]
-tLen = 100 %time length [ms]
+Tstart = 100 %start time [ms]
+Tlen = 100 %time length [ms]
 Istep = 1 %current
 
-tEnd = tStart+tLen
+Tend = Tstart+Tlen
 
 % Functions
-stepTS = GenerateTransientStep(tStart, tEnd, T, N_pre)
+stepTS = GenerateTransientStep(Tstart, Tend, T, N_pre)
 ITransientStep(X,t) = Istep*stepTS(max(1,round(t/dt)), :)
 
 % Record all the things!

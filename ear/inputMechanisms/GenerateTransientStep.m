@@ -1,4 +1,4 @@
-function stepTS = GenerateTransientStep(tStart, tEnd, T, nCells, stepCells)
+function stepTS = GenerateTransientStep(tStart, tEnd, t, nCells, stepCells)
 %% GenerateTransientStep
 % Author: Erik Roberts
 %
@@ -17,5 +17,5 @@ if ~exist('stepCells', 'var')
   stepCells = 1:nCells;
 end
 
-stepTS = zeros(length(T), nCells);
-stepTS((T >= tStart) & (T <= tEnd), stepCells) = 1; % T x cells
+stepTS = zeros(length(t), nCells);
+stepTS((t >= tStart) & (t <= tEnd), stepCells) = 1; % T x cells

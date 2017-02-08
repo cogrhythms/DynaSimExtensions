@@ -1,6 +1,6 @@
-% iPoissonAMPA:
-%   Produces synaptic consistently spaced spike trains in the fashion of a
-%   regular synapse.
+% iPoissonInhomogAMPA.mech:
+%   Produces synaptic poisson-distributed spike trains in the fashion of a
+%   regular synapse. Lambda varies over time. Same lambda for each source.
 %   2 modes:
 %     1) A single pool of sources that is connected to all cells. Default mode.
 %     2) A unique pool of sources exists for each cell. Set uniqueSourcesBool = true.
@@ -8,10 +8,13 @@
 %   The total input to any one target cell is divided by the number of sources
 %   to "normalize" the current contribution.
 %
-% Dependencies: Relies on "GeneratePoissonSpikeTrain.m" though I'm not sure if that file
-%   needs to be in just your DNSIM path, or the database itself, or either.
+% Dependencies: Relies on "calcInhomogRate.m" and "GeneratePoissonSpikeTrain.m"
 %
 % Usage: Use it as an autapse connection: e.g. "TC-TC".
+%   baseRate: min spiking rate
+%   maxRate: max spiking rate
+%   modulationType: 'von mises', 'square', 'sine', 'triangle'
+%   freq: modulation frequency of spiking rates
 %
 % Author: Erik Roberts. Originally from  Ben Poletta-Pittman. It was then modified
 %   by Austin Soplata using "dend_iMultiPoissonExp.txt" as a template.
@@ -19,20 +22,28 @@
 % Tags: synapse, connection
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-rate = 2
 gSyn = 1
 Esyn = 1
 tau_1 = 1
 tau_d = 1
 tau_r = .25
-Nsources = 1 %n of sources of spikes
+Nsources = 100 %n of sources of spikes
 prob_cxn = 1
-Tstart = 0
+
+Tstart = 100
+baseRate = 10 %Hz
+maxRate = 300 %Hz
+modulationType = 'square'
+freq = 2 %Hz
+rateNoiseAmp = 0 
+freqNoiseAmp = 0 %or freq*.1
+upTime = []
+
 uniqueSourcesBool = false
 
 % Connectivity
 if ~uniqueSourcesBool
-  netcon = rand(Nsources,N_post)<=prob_cxn
+  netcon = rand(Nsources,N_post)<=prob_cxn;
   NsourcesTot = Nsources;
 else
   netcon = repmat(eye(Nsources), N_post,1);
@@ -40,11 +51,12 @@ else
 end
 
 % Functions
-Gspikes = GeneratePoissonSpikeTrain(NsourcesTot, rate, tau_1, tau_d, tau_r, T, dt, Tstart)
+rate = calcInhomogRate(T, Tstart, baseRate, maxRate, modulationType, freq, rateNoiseAmp, freqNoiseAmp, upTime);
+Gspikes = GeneratePoissonSpikeTrain(NsourcesTot, rate, tau_1, tau_d, tau_r, T, dt, Tstart);
 
-IPoissonAMPA(X,t) = gSyn/Nsources .* Gspikes(max(1,round(t/dt)), :) * netcon .* (X-Esyn)
+IPoissonInhomogAMPA(X,t) = gSyn/Nsources .* Gspikes(max(1,round(t/dt)), :) * netcon .* (X-Esyn);
 
 % Record all the things!
 monitor functions
 
-@current += -IPoissonAMPA(X,t)
+@current += -IPoissonInhomogAMPA(X,t)

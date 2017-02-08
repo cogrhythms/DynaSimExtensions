@@ -1,5 +1,5 @@
 function plotDsMechanisms(data, s, populationNumber)
-  popName = s.populations(1).name;
+  popName = s.populations(populationNumber).name;
   simDatafields = fieldnames(data);
   mechs = s.populations(populationNumber).mechanism_list;
   
@@ -10,10 +10,11 @@ function plotDsMechanisms(data, s, populationNumber)
     if ~isempty(mechFields)
       for fieldInd = 1:length(mechFields)
         mechField = mechFields{fieldInd};
-        h(fieldInd) = PlotData(data,'variable', mechField,'visible','off');
+        handles = PlotData(data,'variable', mechField,'visible','off','max_num_rows',1);
+        h(fieldInd) = handles(1);
     %       ti{fieldInd} = strrep(mechField,'_','-');
         lastInd = regexpi(mechField,mech,'end');
-        ti{fieldInd} = mechField(lastInd+2:end);
+        ti{fieldInd} = mechField(lastInd(1)+2:end);
       end
       
       axisLinkType = 'x';

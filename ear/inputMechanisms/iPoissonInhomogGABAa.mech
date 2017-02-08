@@ -1,0 +1,62 @@
+% iPoissonInhomogGABAa:
+%   Produces synaptic poisson-distributed spike trains in the fashion of a
+%   regular synapse. Lambda varies over time. Same lambda for each source.
+%   2 modes:
+%     1) A single pool of sources that is connected to all cells. Default mode.
+%     2) A unique pool of sources exists for each cell. Set uniqueSourcesBool = true.
+%   For both modes, connections can be made random by reducing prob_cxn from 1.
+%   The total input to any one target cell is divided by the number of sources
+%   to "normalize" the current contribution.
+%
+% Dependencies: Relies on "calcInhomogRate.m" and "GeneratePoissonSpikeTrain.m"
+%
+% Usage: Use it as an autapse connection: e.g. "TC-TC".
+%   baseRate: min spiking rate
+%   maxRate: max spiking rate
+%   modulationType: 'von mises', 'square', 'sine', 'triangle'
+%   freq: modulation frequency of spiking rates
+%
+% Author: Erik Roberts. Originally from  Ben Poletta-Pittman. It was then modified
+%   by Austin Soplata using "dend_iMultiPoissonExp.txt" as a template.
+%
+% Tags: synapse, connection
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+gSyn = 1
+Esyn = -80
+tau_1 = 1
+tau_d = 5
+tau_r = .25
+Nsources = 100 %n of sources of spikes
+prob_cxn = 1
+
+Tstart = 100
+baseRate = 60 %Hz
+maxRate = 150 %Hz %125hz normal to 250 Hz in PD (4 vs 8ms isi)% Tremblay 1991
+modulationType = 'square'
+freq = 2 %Hz
+rateNoiseAmp = 0
+freqNoiseAmp = 0
+upTime = []
+
+uniqueSourcesBool = false
+
+% Connectivity
+if ~uniqueSourcesBool
+  netcon = rand(Nsources,N_post)<=prob_cxn;
+  NsourcesTot = Nsources;
+else
+  netcon = repmat(eye(Nsources), N_post,1);
+  NsourcesTot = Nsources * N_post;
+end
+
+% Functions
+rate = calcInhomogRate(T, Tstart, baseRate, maxRate, modulationType, freq, rateNoiseAmp, freqNoiseAmp, upTime);
+Gspikes = GeneratePoissonSpikeTrain(NsourcesTot, rate, tau_1, tau_d, tau_r, T, dt, Tstart);
+
+IPoissonInhomogGABAa(X,t) = gSyn/Nsources .* Gspikes(max(1,round(t/dt)), :) * netcon .* (X-Esyn)
+
+% Record all the things!
+monitor functions
+
+@current += -IPoissonInhomogGABAa(X,t)
